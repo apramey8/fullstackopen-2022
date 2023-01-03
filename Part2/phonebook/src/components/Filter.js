@@ -2,17 +2,10 @@
 import { useState } from 'react'
 
 
-const Filter = ({persons, setFilteredPerson}) => {
-
-    const [ filter, setFilter ] = useState('')
+const Filter = ({filter, setFilter}) => {
     
     const handleFilterChange = (event) =>{
         setFilter(event.target.value)
-
-        if(event.target.value == '')
-            setFilteredPerson(persons)
-        else
-            setFilteredPerson(persons.filter((person) => (person.name.toLowerCase().indexOf(event.target.value.toLowerCase()) !== -1 )))
     }
 
     return(

@@ -1,6 +1,7 @@
 import { useState } from 'react'
+import personService from '../services/personService'
 
-const PersonForm = ({persons, setPersons}) => {
+const PersonForm = ({persons, setPersons, setMessage}) => {
 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
@@ -8,12 +9,45 @@ const PersonForm = ({persons, setPersons}) => {
   const addDetail = (event) =>{
       event.preventDefault()
 
-      if(persons.some(person => person.name === newName.trim())){
-        alert(`${newName} is already present`)    
-        return  
+      debugger;
+      const existingPerson = persons.filter(person => person.name.trim() == newName.trim())
+      if(existingPerson.length != 0){
+        if(window.confirm(`${newName} is already present, replace the old number with a new one?`)){
+          personService
+          .putPerson({name : newName,  number : newNumber}, existingPerson[0].id)
+          .then((returnedPerson) => {
+            setPersons(persons.map(person => person.id === returnedPerson.id ? returnedPerson : person))
+            setMessage({message:`Updated ${returnedPerson.name}`, className: 'success'})
+            setTimeout(() => {
+              setMessage(null)
+            },5000)
+          })
+          .catch((error) => {
+            setMessage({message: error.response.data.error,className: 'error'})
+            setTimeout(()=>{
+              setMessage(null)
+            },5000)
+          })
+        }
+      }
+      else{
+        personService
+        .postPerson({name : newName, number: newNumber})
+        .then((returnedPerson)=>{
+          setPersons(persons.concat(returnedPerson))
+          setMessage({message:`Added ${returnedPerson.name}`, className: 'success'})
+          setTimeout(() => {
+            setMessage(null)
+          },5000)
+        })
+        .catch((error) => {
+          setMessage({message: error.response.data.error,className: 'error'})
+          setTimeout(()=>{
+            setMessage(null)
+          },5000)
+        })
       }
 
-      setPersons(persons.concat({ name : newName, number : newNumber, id : persons.length + 1}));
       setNewName('');
       setNewNumber('');
     }

@@ -3,6 +3,7 @@ import PersonForm  from './components/PersonForm.js'
 import Persons from './components/Persons'
 import Filter  from './components/Filter.js'
 import personService from './services/personService'
+import Notification from './components/Notification.js'
 
 const App = () => {
 
@@ -41,6 +42,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification notify={message}/>
       <div>
         <Filter filter={filter} setFilter={setFilter}/>
       </div>

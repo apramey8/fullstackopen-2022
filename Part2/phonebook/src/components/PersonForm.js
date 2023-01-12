@@ -8,8 +8,6 @@ const PersonForm = ({persons, setPersons, setMessage}) => {
 
   const addDetail = (event) =>{
       event.preventDefault()
-
-      debugger;
       const existingPerson = persons.filter(person => person.name.trim() == newName.trim())
       if(existingPerson.length != 0){
         if(window.confirm(`${newName} is already present, replace the old number with a new one?`)){

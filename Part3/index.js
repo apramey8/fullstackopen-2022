@@ -14,10 +14,6 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms - 
 
 const Person = require('./models/person')
 
-app.get('/', (request, response) => {
-  response.send('<h1>Hello World!</h1>')
-})
-
 app.get('/info', (request, response) => {
   Person.countDocuments({}).then(count => {
     response.set('Content-Type', 'text/html')
@@ -56,7 +52,7 @@ app.post('/api/persons', (request, response, next) => {
 
   if (!body.name || !body.number) {
     return response.status(400).json({
-      error: 'name or number missing'
+      error: 'Name or Number is Missing'
     })
   }
 
@@ -77,17 +73,16 @@ app.put('/api/persons/:id', (request, response, next) => {
 })
 
 const unknownEndpoint = (request, response) => {
-  response.status(404).send({ error: 'unknown endpoint' })
+  response.status(404).send({ error: 'Endpoint unknown' })
 }
 
-// handler of requests with unknown endpoint
 app.use(unknownEndpoint)
 
 const errorHandler = (error, request, response, next) => {
   console.error(error.message)
 
   if (error.name === 'CastError') {
-    return response.status(400).send({ error: 'malformatted id' })
+    return response.status(400).send({ error: 'Not a valid ID' })
   } else if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message })
   }
@@ -95,9 +90,7 @@ const errorHandler = (error, request, response, next) => {
   next(error)
 }
 
-// this has to be the last loaded middleware.
 app.use(errorHandler)
-
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {

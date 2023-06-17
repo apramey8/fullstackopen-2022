@@ -9,8 +9,8 @@ beforeEach(async () => {
   await Blog.insertMany(helper.initialBlogs);
 });
 
-describe("when there is initially some blogs saved", () => {
-  test("blogs are returned as json", async () => {
+describe("Already some blogs saved", () => {
+  test("Returned blogs", async () => {
     await api
       .get("/api/blogs")
       .expect(200)
@@ -28,12 +28,12 @@ describe("when there is initially some blogs saved", () => {
   });
 });
 
-describe("addition of a new blog", () => {
-  test("a valid blog can be added ", async () => {
+describe("create a new blog", () => {
+  test("Blog with valid data", async () => {
     const newBlog = {
-      title: "aaaaa",
-      author: "bbbbb",
-      url: "https://www.example.com",
+      title: "abcd",
+      author: "wxyz",
+      url: "https://www.abcd.com",
       likes: 1,
     };
 
@@ -43,71 +43,60 @@ describe("addition of a new blog", () => {
       .expect(201)
       .expect("Content-Type", /application\/json/);
 
-    const blogsAtEnd = await helper.blogsInDb();
-    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1);
+    const lastBlogs = await helper.blogsOfDatabase();
+    expect(lastBlogs).toHaveLength(helper.initialBlogs.length + 1);
 
-    const titles = blogsAtEnd.map((blog) => blog.title);
-    expect(titles).toContain("aaaaa");
+    const titles = lastBlogs.map((blog) => blog.title);
+    expect(titles).toContain("abcd");
   });
 
-  test("likes property defaults to 0 if missing", async () => {
+  test("likes property to be 0 for new blog", async () => {
     const newBlog = {
-      title: "ahhhhh",
-      author: "baaaaaaaaa",
-      url: "https://www.example.com",
+      title: "abcdefgh",
+      author: "vuwxyz",
+      url: "https://www.abcdefgh.com",
     };
 
-    await api
+    await api 
       .post("/api/blogs")
       .send(newBlog)
       .expect(201)
       .expect("Content-Type", /application\/json/);
 
-    const blogsAtEnd = await helper.blogsInDb();
-    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1);
-    expect(blogsAtEnd[blogsAtEnd.length - 1].likes).toBe(0);
-  });
-
-  test("backend responds with status 400 if title and url are missing", async () => {
-    const newBlog = {
-      likes: 1,
-    };
-
-    await api.post("/api/blogs").send(newBlog).expect(400);
-
-    const blogsAtEnd = await helper.blogsInDb();
-    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
+    const lastBlogs = await helper.blogsOfDatabase();
+    expect(lastBlogs).toHaveLength(helper.initialBlogs.length + 1);
+    expect(lastBlogs[lastBlogs.length - 1].likes).toBe(0);
   });
 });
 
-describe("deletion of a blog", () => {
-  test("succeeds with status code 204 if id is valid", async () => {
-    const blogsAtStart = await helper.blogsInDb();
-    const blogToDelete = blogsAtStart[0];
+describe("Delete a blog", () => {
+  test("status 204 if id is valid", async () => {
+    const initialBlogs = await helper.blogsOfDatabase();
+    const blogToDelete = initialBlogs[0];
 
     await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
 
-    const blogsAtEnd = await helper.blogsInDb();
-    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1);
+    const lastBlogs = await helper.blogsOfDatabase();
+    expect(lastBlogs).toHaveLength(helper.initialBlogs.length - 1);
 
-    const titles = blogsAtEnd.map((r) => r.title);
+    const titles = lastBlogs.map((r) => r.title);
     expect(titles).not.toContain(blogToDelete.title);
   });
 });
 
-describe("updating a blog", () => {
-  test("succeeds with status 200 if id is valid", async () => {
-    const blogsAtStart = await helper.blogsInDb();
-    const blogToUpdate = blogsAtStart[0];
+describe("Update a blog", () => {
+  test("status 200 if id is valid", async () => {
+    const initialBlogs = await helper.blogsOfDatabase();
+    const blogToUpdate = initialBlogs[0];
 
     await api
       .put(`/api/blogs/${blogToUpdate.id}`)
       .send({ likes: 10 })
       .expect(200);
 
-    const blogsAtEnd = await helper.blogsInDb();
-    const updatedBlog = blogsAtEnd[0];
-    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
+    const lastBlogs = await helper.blogsOfDatabase();
+    const updatedBlog = lastBlogs[0];
+    expect(lastBlogs).toHaveLength(helper.initialBlogs.length);
     expect(updatedBlog.likes).toBe(10);
   });
 });

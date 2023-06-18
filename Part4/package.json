@@ -22,8 +22,10 @@
     "express": "^4.17.3",
     "mongoose": "^6.2.10",
     "lodash": "^4.17.21",
-    "express-async-errors": "^3.1.1"
-  },
+    "express-async-errors": "^3.1.1",
+    "bcrypt": "^5.0.1",
+    "jsonwebtoken": "^8.5.1"
+    },
   "jest": {
     "testEnvironment": "node"
   }

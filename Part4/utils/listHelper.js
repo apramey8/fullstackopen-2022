@@ -1,16 +1,20 @@
+const lodash = require("lodash");
+
 const dummy = (blogs) => {
   return 1;
 };
 
 const totalLikes = (blogs) => {
-  return blogs.length === 0 ? 0 : blogs.reduce((sum, blog) => sum + blog.likes, 0);
+  return blogs.length === 0
+    ? 0
+    : blogs.reduce((sum, post) => sum + post.likes, 0);
 };
 
 const favoriteBlog = (blogs) => {
   if (blogs.length === 0) return null;
 
-  const mostLiked = blogs.reduce((previous, current) => {
-    return previous.likes > current.likes ? previous : current;
+  const mostLiked = blogs.reduce((prev, curr) => {
+    return prev.likes > curr.likes ? prev : curr;
   });
 
   return {
@@ -20,33 +24,35 @@ const favoriteBlog = (blogs) => {
   };
 };
 
-const lodash = require("lodash");
-
 const mostBlogs = (blogs) => {
-  const blogCount = lodash.countBy(blogs, "author");
+  if (blogs.length === 0) return null;
 
-  const maxAuthor = Object.keys(blogCount).reduce((a, b) => {
-    return blogCount[a] > blogCount[b] ? a : b;
+  const authorCount = lodash.countBy(blogs, "author");
+
+  const topAuthor = Object.keys(authorCount).reduce((a, b) => {
+    return authorCount[a] > authorCount[b] ? a : b;
   });
 
   return {
-    author: maxAuthor,
-    blogs: blogCount[maxAuthor],
+    author: topAuthor,
+    blogs: authorCount[topAuthor],
   };
 };
 
 const mostLikes = (blogs) => {
-    const likeCount = lodash(blogs)
-      .groupBy("author")
-      .map((objs, key) => ({
-        author: key,
-        likes: lodash.sumBy(objs, "likes"),
-      }))
-      .value();
-  
-    return likeCount.reduce((a, b) => {
-      return a.likes > b.likes ? a : b;
-    });
-  };
-  
-  module.exports = { dummy, totalLikes, favoriteBlog, mostBlogs, mostLikes };
+  if (blogs.length === 0) return null;
+
+  const likesCount = lodash(blogs)
+    .groupBy("author")
+    .map((objs, key) => ({
+      author: key,
+      likes: lodash.sumBy(objs, "likes"),
+    }))
+    .value();
+
+  return likesCount.reduce((a, b) => {
+    return a.likes > b.likes ? a : b;
+  });
+};
+
+module.exports = { dummy, totalLikes, favoriteBlog, mostBlogs, mostLikes };
